@@ -1,0 +1,13 @@
+## What is a Stored Procedure (SP)? ##
+A Stored Procedure is a set of SQL statements that are saved in the database and can be reused whenever needed.
+It is like a function in programming: you call it, and it performs a task (e.g., inserting data, retrieving records, updating tables).
+Why Use SPs?
+Reduces repetition of code.
+Improves performance by reducing query parsing.
+Adds security by hiding SQL logic.
+
+### Types of Stored Procedures ###
+SQL Server categorizes the stored procedures mainly in two types:
+
+User-defined Stored Procedures
+System Stored Procedures
