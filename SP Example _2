@@ -1,0 +1,89 @@
+Example: Stored Procedure for Update and Delete
+Table Structure
+Assume we have a table named Employees:
+
+sql
+CREATE TABLE Employees (
+    EmployeeID INT PRIMARY KEY,
+    FirstName NVARCHAR(50),
+    LastName NVARCHAR(50),
+    Department NVARCHAR(50),
+    Salary DECIMAL(10, 2)
+);
+---------------------###################_---------------------------
+Stored Procedure
+Here is the procedure to perform both update and delete operations:
+----------
+CREATE PROCEDURE ManageEmployeeRecord
+    @Action NVARCHAR(10),        -- Action to perform: 'UPDATE' or 'DELETE'
+    @EmployeeID INT,             -- Employee ID (mandatory)
+    @FirstName NVARCHAR(50) = NULL, -- First name (optional for UPDATE)
+    @LastName NVARCHAR(50) = NULL,  -- Last name (optional for UPDATE)
+    @Department NVARCHAR(50) = NULL, -- Department (optional for UPDATE)
+    @Salary DECIMAL(10, 2) = NULL    -- Salary (optional for UPDATE)
+AS
+BEGIN
+    -- Check the action to perform
+    IF UPPER(@Action) = 'UPDATE'
+    BEGIN
+        -- Perform update operation
+        UPDATE Employees
+        SET 
+            FirstName = COALESCE(@FirstName, FirstName),
+            LastName = COALESCE(@LastName, LastName),
+            Department = COALESCE(@Department, Department),
+            Salary = COALESCE(@Salary, Salary)
+        WHERE EmployeeID = @EmployeeID;
+
+        PRINT 'Employee record updated successfully.';
+    END
+    ELSE IF UPPER(@Action) = 'DELETE'
+    BEGIN
+        -- Perform delete operation
+        DELETE FROM Employees
+        WHERE EmployeeID = @EmployeeID;
+
+        PRINT 'Employee record deleted successfully.';
+    END
+    ELSE
+    BEGIN
+        PRINT 'Invalid action. Please specify "UPDATE" or "DELETE".';
+    END
+END;
+--------------------
+Explanation:
+@Action Parameter: Determines the operation:
+UPDATE: Updates the record.
+DELETE: Deletes the record.
+@EmployeeID: Mandatory parameter for identifying the record.
+Other Parameters:
+Optional parameters (@FirstName, @LastName, @Department, @Salary) are used only for the update operation.
+COALESCE ensures that if a parameter is not passed, the column value remains unchanged.
+Conditional Logic:
+Uses IF conditions to check the action and perform the respective operation.
+----------------------------
+
+Usage:
+1. Update Employee Record
+Update the first name and salary of the employee with EmployeeID = 1.
+
+EXEC ManageEmployeeRecord 
+    @Action = 'UPDATE',
+    @EmployeeID = 1,
+    @FirstName = 'John',
+    @Salary = 75000;
+
+2. Delete Employee Record
+Delete the employee with EmployeeID = 2.
+EXEC ManageEmployeeRecord 
+    @Action = 'DELETE',
+    @EmployeeID = 2;
+
+3. Invalid Action
+Pass an invalid action to see the error message.
+
+EXEC ManageEmployeeRecord 
+    @Action = 'INVALID',
+    @EmployeeID = 3;
+
+----------------
