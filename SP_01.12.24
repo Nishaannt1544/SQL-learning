@@ -1,0 +1,46 @@
+select *from Customers
+
+create procedure managecustomer
+@action varchar(10),
+@customerid int,
+@country varchar(50)=null,
+@customername varchar(50)=null,
+@city varchar(50)=null
+as
+begin
+if @action='update'
+begin
+update customers
+set Country=ISNULL(@country,country),
+city=ISNULL(@city,city),
+CustomerName=ISNULL(@customername,customername) where CustomerID=@customerid;
+print 'customers updated sucessfully';
+end
+else
+if @action='delete'
+begin
+delete from customers where CustomerID=@customerid;
+print 'customers deleted sucessfully';
+end 
+else
+begin
+print 'invalid action use update or delete';
+end 
+end ;
+
+---update details in customer by sp
+exec managecustomer
+@action='update',
+@customerid=1,
+@country='india'
+
+---delete details in customer by sp
+exec managecustomer
+@action='delete',
+@customerid=1
+
+---provide invalid action to see the error
+exec managecustomer
+@action='modify',
+@customerid=1,
+@country='india'
