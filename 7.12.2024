@@ -1,0 +1,59 @@
+Function in SQL Server:
+A function in MS SQL Server is a database object that allows you to encapsulate a reusable block of code. 
+Functions can accept input parameters and return a value. 
+Functions are often used to perform calculations, manipulate data, and return results in queries.
+
+Function Definition
+A function in SQL Server is defined using the CREATE FUNCTION statement. It can be either a scalar function (returns a single value) or a table-valued function 
+(returns a table). 
+Functions are used to encapsulate reusable logic, which can be invoked in SQL queries or other functions.
+--------------Types of Functions in SQL Server
+SQL Server supports two main types of functions:
+
+1. Scalar Functions
+A scalar function returns a single value, such as a number, string, or date.
+Scalar functions can be used in SELECT statements, WHERE clauses, or any other expression that expects a single value.
+
+CREATE FUNCTION dbo.GetTotalPrice
+(
+    @OriginalPrice DECIMAL(10, 2),
+    @Discount DECIMAL(5, 2)
+)
+RETURNS DECIMAL(10, 2)
+AS
+BEGIN
+    DECLARE @TotalPrice DECIMAL(10, 2);
+    SET @TotalPrice = @OriginalPrice - (@OriginalPrice * @Discount / 100);
+    RETURN @TotalPrice;
+END;
+
+CREATE FUNCTION dbo.GetNetSalary
+(
+    @Gross_salary DECIMAL(10, 2),
+    @Tax DECIMAL(5, 2),
+	@OtherDeduction int
+)
+RETURNS DECIMAL(10, 2)
+AS
+BEGIN
+    DECLARE @NetSalary DECIMAL(10, 2);
+    SET @NetSalary = @Gross_salary - (@Gross_salary * @Tax / 100) -@OtherDeduction;
+    RETURN @NetSalary;
+END;
+
+
+select dbo.GetNetSalary (10000 ,10 ,900)
+
+
+CREATE FUNCTION dbo.CalculateAge
+(
+    @DateOfBirth DATE
+)
+RETURNS INT
+AS
+BEGIN
+    -- Calculate the difference in years using DATEDIFF
+    RETURN DATEDIFF(YEAR, @DateOfBirth, GETDATE());
+END;
+
+SELECT dbo.CalculateAge('1993-4-10') AS Age;
