@@ -1,0 +1,105 @@
+use trigger_exmaple
+
+
+CREATE TABLE Employees (
+    EmployeeID INT PRIMARY KEY,
+    FirstName VARCHAR(50),
+    LastName VARCHAR(50),
+    Position VARCHAR(50)
+);
+
+
+select * from employees
+
+Create table employe_audit(
+  audit_id int identity (1,1) primary key,
+  EmployeeID int,
+  FirstName VARCHAR(50),
+  LastName VARCHAR(50),
+  Action varchar (50),
+  Action_date Datetime default getdate (),
+  Login_name Varchar (100),
+  Sys_name VArchar (100),
+  Host_name varchar (100),
+  Action_type Varchar(100),
+  Ip_Address varchar (100) );
+
+
+Select * from employe_audit
+select * from employees
+
+Create trigger auditemployeeinsert 
+ON employees
+After insert
+as begin 
+declare @Login_name Varchar (100),
+        @Sys_name VArchar (100),
+        @Host_name varchar (100),
+        @Ip_Address varchar (100);
+		Set @Login_name = SYSTEM_USER;
+		Set @Sys_name = HOST_NAME();
+		SET @Host_name = HOST_NAME();
+		Set @Ip_Address = HOST_NAME();
+		insert into employe_audit (EmployeeID,FirstName,LastName,Action,Login_name,Sys_name,Host_name,Action_type,Ip_Address)
+		Select EmployeeID,FirstName,LastName, 'INSERT', @Login_name, @Sys_name,@Host_name,'INSERT',  @Ip_Address
+		From inserted;
+		end;
+
+
+
+Insert into employees values (1,'Nishant','Patel','Engineer')
+Insert into employees values (2,'Nikunj','Patel','Manager')
+Update employees SET Position
+
+
+Create trigger auditemployeechanges
+ON employees
+After insert,update,delete 
+as begin 
+declare @Login_name Varchar (100),
+        @Sys_name VArchar (100),
+        @Host_name varchar (100),
+        @Ip_Address varchar (100);
+		Set @Login_name = SYSTEM_USER;
+		Set @Sys_name = HOST_NAME();
+		SET @Host_name = HOST_NAME();
+		Set @Ip_Address = HOST_NAME();
+
+		IF exists (select * from inserted )
+		Begin
+		insert into employe_audit (EmployeeID,FirstName,LastName,Action,Login_name,Sys_name,Host_name,Action_type,Ip_Address)
+		Select EmployeeID,FirstName,LastName, 'INSERT', @Login_name, @Sys_name,@Host_name,'INSERT',  @Ip_Address
+		From inserted;
+		end
+
+		IF exists (select * from Deleted)
+		Begin
+		insert into employe_audit (EmployeeID,FirstName,LastName,Action,Login_name,Sys_name,Host_name,Action_type,Ip_Address)
+		Select EmployeeID,FirstName,LastName, 'UPDATE', @Login_name, @Sys_name,@Host_name,'INSERT',  @Ip_Address
+		From inserted;
+		end
+
+		IF exists (select * from Deleted )
+		Begin
+		insert into employe_audit (EmployeeID,FirstName,LastName,Action,Login_name,Sys_name,Host_name,Action_type,Ip_Address)
+		Select EmployeeID,FirstName,LastName, 'DELETE', @Login_name, @Sys_name,@Host_name,'INSERT',  @Ip_Address
+		From Deleted ;
+		end 
+
+		end;
+
+
+Select * from employe_audit
+select * from employees
+
+
+Insert into employees values (3,'Chandani','Patel','HR')
+Insert into employees values (2,'Nikunj','Patel','Manager')
+Update employees SET Position = 'Senior Engineer'
+Where EmployeeID = 1
+
+
+
+
+
+
